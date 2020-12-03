@@ -40,16 +40,20 @@ def create():
         # TODO: Get the new plant's name, variety, photo, & date planted, and 
         # store them in the object below.
         new_plant = {
-            'name': 'plant_name',
-            'variety': 'variety',
-            'photo_url': 'photo',
-            'date_planted': 'date_planted'
+            'name': request.form.get('plant_name'),
+            'variety': request.form.get('variety'),
+            'photo_url': request.form.get('photo'),
+            'date_planted': request.form.get('date_planted')
         }
         # TODO: Make an `insert_one` database call to insert the object into the
         # database's `plants` collection, and get its inserted id. Pass the 
         # inserted id into the redirect call below.
+        returned_obj = plants_collection.insert_one(new_plant)
 
-        return redirect(url_for('detail', plant_id=''))
+
+        print(url_for('detail', plant_id=1))
+
+        return redirect(url_for('detail', plant_id=returned_obj.inserted_id))
 
     else:
         return render_template('create.html')
@@ -60,7 +64,7 @@ def detail(plant_id):
 
     # TODO: Replace the following line with a database call to retrieve *one*
     # plant from the database, whose id matches the id passed in via the URL.
-    plant_to_show = ''
+    plant_to_show = plants_collection.find_one({'_id': ObjectId(plant_id)})
 
     # TODO: Use the `find` database operation to find all harvests for the
     # plant's id.
@@ -83,8 +87,8 @@ def harvest(plant_id):
     # TODO: Create a new harvest object by passing in the form data from the
     # detail page form.
     new_harvest = {
-        'quantity': '', # e.g. '3 tomatoes'
-        'date': '',
+        'quantity': request.form.get('harvested_amount'), # e.g. '3 tomatoes'
+        'date': request.form.get('date_planeted'),
         'plant_id': plant_id
     }
 
