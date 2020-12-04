@@ -21,7 +21,7 @@ def plants_list():
 
     # TODO: Replace the following line with a database call to retrieve *all*
     # plants from the Mongo database's `plants` collection.
-    plants_data = mongo.db.data.find({'plants': True})
+    plants_data = plants_collection.find({'plants': True})
 
     context = {
         'plants': plants_data,
@@ -70,7 +70,7 @@ def detail(plant_id):
     # plant's id.
     # HINT: This query should be on the `harvests` collection, not the `plants`
     # collection.
-    harvests = ''
+    harvests = harvest_collection.find({'harvests': True})
 
     context = {
         'plant' : plant_to_show,
@@ -94,6 +94,7 @@ def harvest(plant_id):
 
     # TODO: Make an `insert_one` database call to insert the object into the 
     # `harvests` collection of the database.
+    result = mongo.db.harvest_collection.insert_one(new_harvest)
 
     return redirect(url_for('detail', plant_id=plant_id))
 
