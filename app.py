@@ -21,6 +21,9 @@ def plants_list():
 
     # TODO: Replace the following line with a database call to retrieve *all*
     # plants from the Mongo database's `plants` collection.
+    plants_collection = db.plants
+    harvest_collection = db.harvest
+
     plants_data = plants_collection.find({'plants': True})
 
     context = {
@@ -94,7 +97,7 @@ def harvest(plant_id):
 
     # TODO: Make an `insert_one` database call to insert the object into the 
     # `harvests` collection of the database.
-    result = mongo.db.harvest_collection.insert_one(new_harvest)
+    plant_id = mongo.db.harvest_collection.insert_one(new_harvest)
 
     return redirect(url_for('detail', plant_id=plant_id))
 
@@ -122,7 +125,9 @@ def edit(plant_id):
 def delete(plant_id):
     # TODO: Make a `delete_one` database call to delete the plant with the given
     # id.
-
+    plants_list = mongo.db.plants.delete_one({
+        
+    })
     # TODO: Also, make a `delete_many` database call to delete all harvests with
     # the given plant id.
 
