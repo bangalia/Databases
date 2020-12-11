@@ -19,12 +19,7 @@ mongo = PyMongo(app)
 def plants_list():
     """Display the plants list page."""
 
-    # TODO: Replace the following line with a database call to retrieve *all*
-    # plants from the Mongo database's `plants` collection.
-    plants_collection = db.plants
-    harvest_collection = db.harvest
-
-    plants_data = plants_collection.find({'plants': True})
+    plants_data = mongo.db.plants.find({'plants': True})
 
     context = {
         'plants': plants_data,
@@ -40,23 +35,20 @@ def about():
 def create():
     """Display the plant creation page & process data from the creation form."""
     if request.method == 'POST':
-        # TODO: Get the new plant's name, variety, photo, & date planted, and 
-        # store them in the object below.
+       
         new_plant = {
             'name': request.form.get('plant_name'),
             'variety': request.form.get('variety'),
             'photo_url': request.form.get('photo'),
             'date_planted': request.form.get('date_planted')
         }
-        # TODO: Make an `insert_one` database call to insert the object into the
-        # database's `plants` collection, and get its inserted id. Pass the 
-        # inserted id into the redirect call below.
-        returned_obj = plants_collection.insert_one(new_plant)
-        returned_obj_id = returned_obj.inserted_id
+      
+        results = mongo.db.plants.insert_one(new_plant)
+        results_id = results.inserted_id
 
-        print(url_for('detail', plant_id=1))
+        print(url_for('detail', plant_id=results_id))
 
-        return redirect(url_for('detail', plant_id=returned_obj.inserted_id))
+        return redirect(url_for('detail', plant_id=results_id))
 
     else:
         return render_template('create.html')
@@ -73,10 +65,10 @@ def detail(plant_id):
 
     context = {
         'plant' : plant_to_show['name'],
-        'date_planted' : plant_to_show['date_planted']
+        'date_planted' : plant_to_show['date_planted'],
         'harvest': harvest,
-        'variety' : plant_to_show['variety']
-        'photo_url' : plant_to_show['photo_url']
+        'variety' : plant_to_show['variety'],
+        'photo_url' : plant_to_show['photo_url'],
         'plant_id' : plant_id
     }
     return render_template('detail.html', **context)
@@ -131,6 +123,9 @@ def edit(plant_id):
 @app.route('/delete/<plant_id>', methods=['POST'])
 def delete(plant_id):
   
+    mongo.db.plants.delete_one({'_id': ObjectId(plant_id)})
+
+    mongo.db.harvest.delete_many({'plant_id': plant_id})
 
     return redirect(url_for('plants_list'))
 
